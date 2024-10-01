@@ -1,0 +1,88 @@
+version: '3.8'
+
+# services:
+#   web:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8080:8080"
+#     depends_on:
+#       db:
+#         condition: service_healthy
+#     environment:
+#       - DB_USER=${POSTGRES_USER}
+#       - DB_PASSWORD=${POSTGRES_PASSWORD}
+#       - DB_NAME=${POSTGRES_DB}
+#     restart: unless-stopped
+#     networks:
+#       - app-network
+
+#   db:
+#     image: postgres:latest
+#     environment:
+#       POSTGRES_DB: ${POSTGRES_DB}
+#       POSTGRES_USER: ${POSTGRES_USER}
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#     ports:
+#       - "5432:5432"
+#     restart: unless-stopped 
+#     networks:
+#       - app-network
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   pgadmin:
+#     image: dpage/pgadmin4:latest
+#     environment:
+#       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+#       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+#     ports:
+#       - "5050:80"
+#     depends_on:
+#       db:
+#         condition: service_healthy
+#     restart: unless-stopped
+#     networks:
+#       - app-network
+
+# volumes:
+#   postgres_data:
+
+# networks:
+#   app-network:
+
+# For Development:
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: devdatabase
+      POSTGRES_USER: mydev
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: devadmin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: devadmin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

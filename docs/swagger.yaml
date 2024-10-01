@@ -1,0 +1,378 @@
+definitions:
+  domain.SwaggerBook:
+    properties:
+      AuthorID:
+        example: 1
+        type: integer
+      ISBN:
+        example: 978-0134190440
+        type: string
+      Price:
+        example: 49.99
+        type: number
+      Quantity:
+        example: 100
+        type: integer
+      Title:
+        example: The Go Programming Language
+        type: string
+      TypeOfBookID:
+        example: 2
+        type: integer
+    type: object
+  domain.SwaggerOrder:
+    properties:
+      CustomerID:
+        type: integer
+      Discount:
+        type: number
+      IsPayment:
+        type: boolean
+      Items:
+        items:
+          $ref: '#/definitions/domain.SwaggerOrderItem'
+        type: array
+      PoNumber:
+        type: string
+      TotalPrice:
+        type: number
+    type: object
+  domain.SwaggerOrderItem:
+    properties:
+      BookID:
+        type: integer
+      OrderID:
+        type: integer
+      Price:
+        type: number
+      Quantity:
+        type: integer
+    type: object
+  domain.SwaggerUser:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: password123
+        type: string
+      role:
+        example: 1
+        type: integer
+    type: object
+  domain.User:
+    properties:
+      Password:
+        type: string
+      Role:
+        type: integer
+      email:
+        type: string
+    type: object
+  handlers.SwaggerFiberMap:
+    additionalProperties: true
+    type: object
+  handlers.SwaggerOrderFiberMap:
+    additionalProperties: true
+    type: object
+info:
+  contact: {}
+  description: This is a sample Book store for Fiber
+  termsOfService: http://swagger.io/terms/
+  title: Book store API
+  version: "1.0"
+paths:
+  /books:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all books
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.SwaggerBook'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.SwaggerFiberMap'
+      summary: Get all books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      description: Create a new book with the provided details
+      parameters:
+      - description: Book object
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SwaggerBook'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new book
+      tags:
+      - books
+  /books/{id}:
+    delete:
+      description: Deletes a book with the given ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.SwaggerFiberMap'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.SwaggerFiberMap'
+      summary: Delete a book
+      tags:
+      - books
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a book's details using its ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.SwaggerBook'
+        "400":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a book by ID
+      tags:
+      - books
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing book with the given ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated book information
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SwaggerBook'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SwaggerFiberMap'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.SwaggerFiberMap'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.SwaggerFiberMap'
+      summary: Update a book
+      tags:
+      - books
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a user, returns a JWT token, and sets it as an HTTP-only
+        cookie
+      parameters:
+      - description: User Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message":"Login Successfully!!
+          headers:
+            Set-Cookie:
+              description: Contains the JWT token
+              type: string
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: error":"Bad Request Error Message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: error":"Unauthorized Error Message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Authenticate a user
+      tags:
+      - users
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all orders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.SwaggerOrder'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.SwaggerOrderFiberMap'
+      summary: Get all orders
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Creates a new order with the provided information
+      parameters:
+      - description: Order information
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SwaggerOrder'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.SwaggerOrderFiberMap'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.SwaggerOrderFiberMap'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.SwaggerOrderFiberMap'
+      summary: Create a new order
+      tags:
+      - orders
+  /orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific order by its ID, including its items
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.SwaggerOrder'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.SwaggerOrderFiberMap'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.SwaggerOrderFiberMap'
+      summary: Get a specific order
+      tags:
+      - orders
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user in the system.
+      parameters:
+      - description: User Registration
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SwaggerUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - users
+swagger: "2.0"
